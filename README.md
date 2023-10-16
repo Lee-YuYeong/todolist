@@ -1,16 +1,19 @@
-# todolist
+# [Flutter] TodoList 만들기
 
-A new Flutter project.
+## 프로젝트 기간
+### 2023.10.13 ~ 2023.10.16
 
-## Getting Started
+## 주요 기능
+  1. 할 일 목록 만들기
+  2. 할 일 완료 명에의 전당 등록하기
+  3. 목록 수정하기
+  4. 목록 삭제하기
 
-This project is a starting point for a Flutter application.
+## 화면 구성
 
-A few resources to get you started if this is your first Flutter project:
+![todoMain](https://github.com/Lee-YuYeong/todolist/assets/130349587/bd218eb5-3a55-4640-bcef-f254f9def7fc) 
+![write](https://github.com/Lee-YuYeong/todolist/assets/130349587/1ea52a36-f348-4153-8782-6dea91f1a41c)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![complete](https://github.com/Lee-YuYeong/todolist/assets/130349587/deabf7da-1236-46da-bdff-331c89a3fe40) | ![update](https://github.com/Lee-YuYeong/todolist/assets/130349587/03ebc579-cb13-4ce9-aff2-1eedf9a9a56f)
+--- | --- |
