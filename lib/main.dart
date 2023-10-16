@@ -46,8 +46,7 @@ class _FirstState extends State<First> {
   @override
   Widget build(BuildContext context) {
     _todoProvider = Provider.of<TodoProvider>(context);
-    print(_todoProvider?.todos);
-    print(_todoProvider?.award);
+
     return Scaffold(
       body: Column(
         children: [
@@ -68,7 +67,6 @@ class _FirstState extends State<First> {
                       onTap: () async {
                         final result = await Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Write()));
-                        print("추가" + result);
                         // if (result != null) {
                           _todoProvider?.addTodo(result);
                         // }
@@ -219,7 +217,6 @@ class _FirstState extends State<First> {
                   final result = await Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Write()));
 
-                  print('수정'+ result);
                    _todoProvider?.updateAward(index, result);
 
                   Navigator.of(context).pop(); //창 닫기

@@ -33,14 +33,15 @@ class _SecondState extends State<Write> {
 
         margin: EdgeInsets.fromLTRB(0, 60, 10, 0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             GestureDetector(
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
               },
               child: SizedBox(
-                  width: double.infinity,
-                  child: Text("취소", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w200),textAlign: TextAlign.end)
+                  // width: double.infinity,
+                  child: Text("취소", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w200))
               ),
             ),
             Container(
@@ -59,7 +60,7 @@ class _SecondState extends State<Write> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(15),
-                    hintText: '모두 힘을 내 작성해보아요.',
+                    hintText: _todoProvider.award[0],
                     labelStyle: TextStyle(
                         color: Colors.grey,
                         fontSize: 20
@@ -75,7 +76,8 @@ class _SecondState extends State<Write> {
                     MaterialPageRoute(builder: (context) => MyApp()));
               },
               child: Container(
-                child: TextButton(child: Text("작성 완료!",style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.w400),),
+                width: double.infinity,
+                child: TextButton(child: Text("작성 완료!",style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.w400),textAlign: TextAlign.center),
                   onPressed: () {
                     String description = myController.text;
                     // _todoProvider.addTodo(description);
