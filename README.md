@@ -20,5 +20,5 @@
 ![update](https://github.com/Lee-YuYeong/todolist/assets/130349587/03ebc579-cb13-4ce9-aff2-1eedf9a9a56f)
 
 
-!![write](https://github.com/Lee-YuYeong/todolist/assets/130349587/1ea52a36-f348-4153-8782-6dea91f1a41c)  |!![complete](https://github.com/Lee-YuYeong/todolist/assets/130349587/deabf7da-1236-46da-bdff-331c89a3fe40)
---- | --- | 
+!![write](https://github.com/Lee-YuYeong/todolist/assets/130349587/1ea52a36-f348-4153-8782-6dea91f1a41c)  |!![complete](https://github.com/Lee-YuYeong/todolist/assets/130349587/deabf7da-1236-46da-bdff-331c89a3fe40) | ![update](https://github.com/Lee-YuYeong/todolist/assets/130349587/03ebc579-cb13-4ce9-aff2-1eedf9a9a56f)
+--- | --- | --- |
