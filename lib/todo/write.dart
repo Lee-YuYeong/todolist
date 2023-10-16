@@ -1,6 +1,8 @@
 // 할 일 작성 페이지
 import 'package:contact/main.dart';
+import 'package:contact/provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Todo {
   final String description;//할 일 내용
@@ -14,7 +16,7 @@ class Write extends StatefulWidget {
 
 class _SecondState extends State<Write> {
   final myController = TextEditingController();
-
+  late TodoProvider _todoProvider;
   @override
   void dispose() {
     myController.dispose();
@@ -25,6 +27,7 @@ class _SecondState extends State<Write> {
 
   @override
   Widget build(BuildContext context) {
+    _todoProvider = Provider.of<TodoProvider>(context, listen: false);
     return Scaffold(
       body: Container(
 
@@ -75,7 +78,9 @@ class _SecondState extends State<Write> {
                 child: TextButton(child: Text("작성 완료!",style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.w400),),
                   onPressed: () {
                     String description = myController.text;
-                    todos.add(Todo(description: description));
+                    // _todoProvider.addTodo(description);
+                    print(description);
+                    // todos.add(Todo(description: description));
                     Navigator.pop(context,description);
 
                   },),
