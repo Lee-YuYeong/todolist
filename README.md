@@ -1,9 +1,5 @@
 # [Flutter] TodoList 만들기
 
-
-# Getting Started
-![todoMain](https://github.com/Lee-YuYeong/todolist/assets/130349587/688dbb32-5494-4e13-82ca-489bb0c1d6b6)
-
 ## 프로젝트 기간
 ### 2023.10.13 ~ 2023.10.16
 
