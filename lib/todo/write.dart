@@ -1,4 +1,6 @@
 // 할 일 작성 페이지
+// ! : null이 절대 아님을 단언
+// ? : null일 수도 있음
 import 'package:contact/main.dart';
 import 'package:contact/provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,8 @@ class Todo {
 }
 
 class Write extends StatefulWidget {
+  final String? defaultValue;
+  const Write({this.defaultValue});
   @override
   _SecondState createState() => _SecondState();
 }
@@ -17,6 +21,15 @@ class Write extends StatefulWidget {
 class _SecondState extends State<Write> {
   final myController = TextEditingController();
   late TodoProvider _todoProvider;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.defaultValue != null) {
+      myController.text = widget.defaultValue!; // 컨트롤러에 기본값 할당
+    }
+
+    _todoProvider = Provider.of<TodoProvider>(context, listen: false);
+  }
   @override
   void dispose() {
     myController.dispose();
@@ -60,7 +73,7 @@ class _SecondState extends State<Write> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(15),
-                    hintText: _todoProvider.award[0],
+                    hintText: '모두 힘을 내 작성해보아요.',
                     labelStyle: TextStyle(
                         color: Colors.grey,
                         fontSize: 20
@@ -81,7 +94,6 @@ class _SecondState extends State<Write> {
                   onPressed: () {
                     String description = myController.text;
                     // _todoProvider.addTodo(description);
-                    print(description);
                     // todos.add(Todo(description: description));
                     Navigator.pop(context,description);
 

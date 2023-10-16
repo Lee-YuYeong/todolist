@@ -7,6 +7,11 @@ class TodoProvider extends ChangeNotifier {
   List<String> get todos => _todos;
   List<String> get award => _award;
 
+  void getAward(int index) {
+    _award[index];
+    notifyListeners();
+  }
+
  void addTodo(String todo) {
    _todos.insert(0, todo);
    notifyListeners();

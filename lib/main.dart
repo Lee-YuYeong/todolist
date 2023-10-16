@@ -215,7 +215,7 @@ class _FirstState extends State<First> {
                 style: ElevatedButton.styleFrom(primary: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () async {
                   final result = await Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Write()));
+                      MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider!.award[index])));
 
                    _todoProvider?.updateAward(index, result);
 
