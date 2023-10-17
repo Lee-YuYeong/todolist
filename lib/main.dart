@@ -163,7 +163,7 @@ class _FirstState extends State<First> {
           actions: <Widget>[
             Container(
               child: OutlinedButton(
-                style: ElevatedButton.styleFrom(primary: Color(0xffffffff),minimumSize: Size(150, 50), ),
+                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff),minimumSize: Size(150, 50), ),
                 onPressed: () {
                   _todoProvider.doneTodo(index, _todoProvider.todos[index]);
                   // setState(() {
@@ -178,7 +178,7 @@ class _FirstState extends State<First> {
             ),
             Container(
               child: OutlinedButton(
-                style: ElevatedButton.styleFrom(primary: Color(0xffffffff), minimumSize: Size(150, 50)),
+                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () {
                   Navigator.of(context).pop(); //창 닫기
                 },
@@ -205,7 +205,7 @@ class _FirstState extends State<First> {
           actions: <Widget>[
             Container(
               child: OutlinedButton(
-                style: ElevatedButton.styleFrom(primary: Color(0xffffffff), minimumSize: Size(150, 50)),
+                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () async {
                   final result = await Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.award[index])));
@@ -220,7 +220,7 @@ class _FirstState extends State<First> {
             ),
             Container(
               child: OutlinedButton(
-                style: ElevatedButton.styleFrom(primary: Color(0xffffffff), minimumSize: Size(150, 50)),
+                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () {
                  _todoProvider.deleteAward(index);
                   Navigator.of(context).pop(); //창 닫기
