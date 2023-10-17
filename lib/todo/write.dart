@@ -1,7 +1,7 @@
 // 할 일 작성 페이지
 // ! : null이 절대 아님을 단언
 // ? : null일 수도 있음
-import 'package:contact/main.dart';
+
 import 'package:contact/provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,15 +20,12 @@ class Write extends StatefulWidget {
 
 class _SecondState extends State<Write> {
   final myController = TextEditingController();
-  late TodoProvider _todoProvider;
   @override
   void initState() {
     super.initState();
     if (widget.defaultValue != null) {
       myController.text = widget.defaultValue!; // 컨트롤러에 기본값 할당
     }
-
-    _todoProvider = Provider.of<TodoProvider>(context, listen: false);
   }
   @override
   void dispose() {
@@ -40,7 +37,6 @@ class _SecondState extends State<Write> {
 
   @override
   Widget build(BuildContext context) {
-    _todoProvider = Provider.of<TodoProvider>(context, listen: false);
     return Scaffold(
       body: Container(
 

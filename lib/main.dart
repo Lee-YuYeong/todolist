@@ -7,11 +7,13 @@ import 'package:provider/provider.dart';
 
 
 void main() {
-  runApp(MultiProvider(providers: [
-    Provider(create: (context) => TodoProvider(),
-    )
-  ],
-  child: MyApp(),
+  runApp(
+      MultiProvider(
+        providers: [
+          Provider(create: (context) => TodoProvider(),
+        )
+       ],
+        child: MyApp(),
   )); //runApp(시작할 메인페이지) : 앱을 시작해주세요~!
 }
 
@@ -42,7 +44,7 @@ class First extends StatefulWidget {
 }
 
 class _FirstState extends State<First> {
-  TodoProvider? _todoProvider;
+  late TodoProvider _todoProvider;
   @override
   Widget build(BuildContext context) {
     _todoProvider = Provider.of<TodoProvider>(context);
@@ -51,13 +53,6 @@ class _FirstState extends State<First> {
       body: Column(
         children: [
           GestureDetector(
-            // onTap: () async {
-            //   final result = await Navigator.push(context,
-            //       MaterialPageRoute(builder: (context) => Write()));
-            //   if (result != null) {
-            //     _todoProvider?.addTodo(result);
-            //   }
-            // },
             child: Container(
               margin: EdgeInsets.fromLTRB(15, 70, 10, 10),
               child: Row(
@@ -67,9 +62,7 @@ class _FirstState extends State<First> {
                       onTap: () async {
                         final result = await Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Write()));
-                        // if (result != null) {
-                          _todoProvider?.addTodo(result);
-                        // }
+                          _todoProvider.addTodo(result);
                       },
                       child : Icon(Icons.add, size: 50,)
                   ),
@@ -92,7 +85,7 @@ class _FirstState extends State<First> {
                 child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    itemCount: _todoProvider?.todos.length,
+                    itemCount: _todoProvider.todos.length,
                     itemBuilder: (BuildContext content, int index) {
                       return Card(
                         elevation: 3,
@@ -102,7 +95,7 @@ class _FirstState extends State<First> {
                           borderRadius: BorderRadius.all(Radius.elliptical(10, 10)),
                         ),
                         child: ListTile(
-                          title: Text(_todoProvider!.todos[index], textAlign: TextAlign.center, style: TextStyle(fontSize: 18, height: 1.7),),
+                          title: Text(_todoProvider.todos[index], textAlign: TextAlign.center, style: TextStyle(fontSize: 18, height: 1.7),),
                           onTap: () => _showDialog(context,index),
                         ),
                       );
@@ -130,7 +123,7 @@ class _FirstState extends State<First> {
                 child: ListView.builder(
                     scrollDirection: Axis.vertical, //스크롤이 증가하는 방향
                     shrinkWrap: true,//true 시 필요한 공간만 차지
-                    itemCount: _todoProvider?.award.length,
+                    itemCount: _todoProvider.award.length,
                     itemBuilder: (BuildContext content, int index) {
                       return Card(
                         elevation: 3,
@@ -140,7 +133,7 @@ class _FirstState extends State<First> {
                           borderRadius: BorderRadius.all(Radius.elliptical(10, 10)),
                         ),
                         child: ListTile(
-                          title: Text(_todoProvider!.award[index], textAlign: TextAlign.center, style: TextStyle(fontSize: 18, height: 1.7),),
+                          title: Text(_todoProvider.award[index], textAlign: TextAlign.center, style: TextStyle(fontSize: 18, height: 1.7),),
                           onTap: () => _awardshowDialog(content, index),
                         ),
                       );
@@ -172,7 +165,7 @@ class _FirstState extends State<First> {
               child: OutlinedButton(
                 style: ElevatedButton.styleFrom(primary: Color(0xffffffff),minimumSize: Size(150, 50), ),
                 onPressed: () {
-                  _todoProvider?.doneTodo(index, _todoProvider!.todos[index]);
+                  _todoProvider.doneTodo(index, _todoProvider.todos[index]);
                   // setState(() {
                   //
                   //   // award.add(todos[index]); // 명예의 전당 리스트 추가
@@ -215,9 +208,9 @@ class _FirstState extends State<First> {
                 style: ElevatedButton.styleFrom(primary: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () async {
                   final result = await Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider!.award[index])));
+                      MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.award[index])));
 
-                   _todoProvider?.updateAward(index, result);
+                   _todoProvider.updateAward(index, result);
 
                   Navigator.of(context).pop(); //창 닫기
 
@@ -229,7 +222,7 @@ class _FirstState extends State<First> {
               child: OutlinedButton(
                 style: ElevatedButton.styleFrom(primary: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () {
-                 _todoProvider?.deleteAward(index);
+                 _todoProvider.deleteAward(index);
                   Navigator.of(context).pop(); //창 닫기
                 },
                 child: Text('삭제', style: TextStyle(color: Colors.black),),
