@@ -50,7 +50,7 @@ class _SecondState extends State<Write> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
+                Navigator.pop(context);
               },
               child: SizedBox(
                   // width: double.infinity,
@@ -85,8 +85,7 @@ class _SecondState extends State<Write> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MyApp()));
+                Navigator.pop(context);
               },
               child: Container(
                 width: double.infinity,
