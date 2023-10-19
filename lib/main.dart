@@ -1,20 +1,33 @@
 // todolist 메인페이지
+//FutureBuilder는 Flutter의 위젯으로, Future 형태의 비동기 데이터를 다루기 쉽게 도와주는 위젯
+//생명 주기
+// initState() : 위젯 초기화
+// didChangeDependencied() : 의존성 변경시 호출
+// didUpdateWidget() : 위젯 갱신 시
+// setState() : 상태 변경 시
+import 'dart:convert';
 
 import 'package:contact/provider/provider.dart';
 import 'package:contact/todo/write.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
+  late TodoProvider _todoProvider;
+  List<Todos> todos = [];
+  List<Todos> award = [];
+
+// todoProvider.addTodo(Todo(idx: todoIndex, todo: "New Todo"));
 
 void main() {
   runApp(
-      MultiProvider(
-        providers: [
-          Provider(create: (context) => TodoProvider(),
-        )
-       ],
-        child: MyApp(),
-  )); //runApp(시작할 메인페이지) : 앱을 시작해주세요~!
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => TodoProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 
@@ -25,29 +38,152 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => TodoProvider(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,//디버그 배너 삭제
-        theme: ThemeData(fontFamily: 'Jua-Regular'),//폰트 설정
-        home: First(),
-      ),
+    _todoProvider = Provider.of<TodoProvider>(context, listen:false);
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Jua-Regular'),
+      home: TodosWidget(),
     );
   }
 }
-class First extends StatefulWidget {
-  //StatelessWidget에선 setState()사용 못하므로 StatefulWidget을 상속 받도록 해줌
-  const First({Key? key}) : super(key: key);
 
-  @override
-  _FirstState createState() => _FirstState();
+//Todo 클래스
+class Todos {
+  int? idx;
+  String? todo;
+  int? isSuccess;
+  String? createAt;
+
+  Todos({this.idx, this.todo, this.isSuccess, this.createAt});
+
+  Todos.fromJson(Map<String, dynamic> json) {
+    idx = json['idx'];
+    todo = json['todo'];
+    isSuccess = json['isSuccess'];
+    createAt = json['createAt'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['idx'] = this.idx.toString();
+    data['todo'] = this.todo;
+    data['isSuccess'] = this.isSuccess.toString(); // 문자열로 변환
+    data['createAt'] = this.createAt;
+    return data;
+  }
 }
 
-class _FirstState extends State<First> {
-  late TodoProvider _todoProvider;
+
+class TodosWidget extends StatefulWidget {
+  const TodosWidget({Key? key}) : super(key: key);
+
+  @override
+  _TodosWidgetState createState() => _TodosWidgetState();
+}
+
+class _TodosWidgetState extends State<TodosWidget> {
+  late Future<List<Todos>> futureTodos;
+  late Future<List<Todos>> futureAward;
+
+  @override
+  void initState() {
+    super.initState();
+    futureTodos = fetchTodos();
+    futureAward = fetchAward();
+  }
+
+  Future<List<Todos>> fetchTodos() async {
+    try {
+      final response = await Dio().get(
+        "https://api2.metabx.io/api/examples"
+      );
+
+      if (response.statusCode == 200) {
+        var data = response.data;
+
+        // print(data['data'][0]['idx']);
+
+        for (var item in data['data']) {
+          int idx = item['idx'];
+          String todo = item['todo'];
+          int isSuccess = item['isSuccess'];
+          String createdAt = item['createdAt'];
+
+          if(isSuccess == 0) {
+            // todos.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+            _todoProvider.addTodo(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+
+          }
+
+          // award.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+          // _todoProvider.data.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+          // print(_todoProvider.data[idx]);
+        }
+        return todos;
+      } else {
+        throw Exception('Failed to load album');
+      }
+    } catch (e) {
+      throw Exception('Error occurred while fetching data');
+    }
+  }
+
+  Future<List<Todos>> fetchAward() async {
+    try {
+      final response = await Dio().get(
+        "https://api2.metabx.io/api/examples"
+      );
+
+      if (response.statusCode == 200) {
+        var data = response.data;
+
+        // print(data['data'][0]['idx']);
+
+        for (var item in data['data']) {
+          int idx = item['idx'];
+          String todo = item['todo'];
+          int isSuccess = item['isSuccess'];
+          String createdAt = item['createdAt'];
+
+          if(isSuccess == 1) {
+            // award.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+            _todoProvider.award.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+          }
+
+          // _todoProvider.data.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+          // print(_todoProvider.data[idx]);
+        }
+        return award;
+      } else {
+        throw Exception('Failed to load album');
+      }
+    } catch (e) {
+      throw Exception('Error occurred while fetching data');
+    }
+  }
+
+  void todoRender() {
+    print("todo");
+    setState(() {
+      futureTodos = fetchTodos();
+    });
+  }
+  void awardRender() {
+    print("award");
+    setState(() {
+      futureAward = fetchAward();
+    });
+  }
+
+
+  // void dispose() {
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
-    _todoProvider = Provider.of<TodoProvider>(context);
+
 
     return Scaffold(
       body: Column(
@@ -60,10 +196,13 @@ class _FirstState extends State<First> {
                   Text("7월 17일",style: TextStyle(fontWeight: FontWeight.w500, fontSize: 50, ), ),
                   GestureDetector(
                       onTap: () async {
-                        final result = await Navigator.push(context,
+                        var result = await Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Write()));
-                          _todoProvider.addTodo(result);
-                      },
+
+                        todoRender();
+                        _todoProvider.addTodo(result);
+                        },
+
                       child : Icon(Icons.add, size: 50,)
                   ),
                 ],
@@ -80,26 +219,46 @@ class _FirstState extends State<First> {
           ),
           Column(
             children: [
-              SizedBox(
-                height: 250,
-                child: ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: _todoProvider.todos.length,
-                    itemBuilder: (BuildContext content, int index) {
-                      return Card(
-                        elevation: 3,
-                        margin: EdgeInsets.all(8),
-                        color: Color(0xfff3eae0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.elliptical(10, 10)),
-                        ),
-                        child: ListTile(
-                          title: Text(_todoProvider.todos[index], textAlign: TextAlign.center, style: TextStyle(fontSize: 18, height: 1.7),),
-                          onTap: () => _showDialog(context,index),
-                        ),
-                      );
-                    }),
+              FutureBuilder<List<Todos>>(
+                future: futureTodos,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child:CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child:
+                    Text('${snapshot.error}'));
+                  } else if(snapshot.hasData){
+                    List<Todos> todos = _todoProvider.todos;
+                    return SizedBox(
+                      height: 250,
+                      child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: _todoProvider.todos.length,
+                          itemBuilder: (BuildContext content, int index) {
+                            Todos todo = todos[index];
+
+                            return Card(
+                              elevation: 3,
+                              margin: EdgeInsets.all(8),
+                              color: Color(0xfff3eae0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                    Radius.elliptical(10, 10)),
+                              ),
+                              child :
+                              ListTile(title :
+                              Text(todo.todo!, textAlign: TextAlign.center,),
+                                onTap:
+                                    () =>_showDialog(content,index),
+                              ),
+                            );
+                          }),
+                    );
+                  }else{
+                    return Center(child: Text('데이터 없음'));
+                  }
+                }
               ),
             ],
           ),
@@ -116,31 +275,58 @@ class _FirstState extends State<First> {
               ],
             ),
           ),
+
           Column(
             children: [
-              SizedBox(
-                height: 250,
-                child: ListView.builder(
-                    scrollDirection: Axis.vertical, //스크롤이 증가하는 방향
-                    shrinkWrap: true,//true 시 필요한 공간만 차지
-                    itemCount: _todoProvider.award.length,
-                    itemBuilder: (BuildContext content, int index) {
-                      return Card(
-                        elevation: 3,
-                        margin: EdgeInsets.all(8),
-                        color: Color(0xfff3eae0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.elliptical(10, 10)),
-                        ),
-                        child: ListTile(
-                          title: Text(_todoProvider.award[index], textAlign: TextAlign.center, style: TextStyle(fontSize: 18, height: 1.7),),
-                          onTap: () => _awardshowDialog(content, index),
-                        ),
+              FutureBuilder<List<Todos>>(
+                  future: futureAward,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child:CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child:
+                      Text('${snapshot.error}'));
+                    } else if(snapshot.hasData){
+                      List<Todos> awards = _todoProvider.award;
+                      // print(snapshot.data?[2].isSuccess);
+                      return SizedBox(
+                        height: 250,
+                        child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: _todoProvider.award.length,
+                            itemBuilder: (BuildContext content, int index) {
+                              // int isSuccess = todos[index].isSuccess!;
+                                Todos award = awards[index];
+                                // print(awards[index].todo);
+                                return Card(
+                                  elevation: 3,
+                                  margin: EdgeInsets.all(8),
+                                  color: Color(0xfff3eae0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.elliptical(10, 10)),
+                                  ),
+                                  child:
+                                  ListTile(title:
+                                  Text(
+                                    award.todo!, textAlign: TextAlign.center,),
+                                    onTap:
+                                        () => _awardshowDialog(content, index),
+                                  ),
+                                );
+
+                            }),
                       );
-                    }),
+                    }else{
+                      return Center(child: Text('데이터 없음'));
+                    }
+                  }
               ),
             ],
-          )
+          ),
+
+
         ],
       ),
     );
@@ -165,13 +351,15 @@ class _FirstState extends State<First> {
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff),minimumSize: Size(150, 50), ),
                 onPressed: () {
-                  _todoProvider.doneTodo(index, _todoProvider.todos[index]);
-                  // setState(() {
-                  //
-                  //   // award.add(todos[index]); // 명예의 전당 리스트 추가
-                  //   // todos.removeAt(index); // 진행 목록 삭제
-                  // });
-                  Navigator.of(context).pop(); //창 닫기
+                  // _todoProvider.doneTodo(index, _todoProvider.todos[index]);
+                  final response = Dio().put(
+                      'https://api2.metabx.io/api/examples/${todos[index].idx}/status');
+
+                  setState(() {
+                    award.add(Todos(idx: todos[index].idx, todo: todos[index].todo, isSuccess: 1, createAt: todos[index].createAt));
+                    todos.removeAt(index);
+                  });
+                      Navigator.of(context).pop(); //창 닫기
                 },
                 child: Text('확인',style: TextStyle(color: Colors.red),),
               ),
@@ -208,11 +396,28 @@ class _FirstState extends State<First> {
                 style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () async {
                   final result = await Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.award[index])));
-
-                   _todoProvider.updateAward(index, result);
+                      MaterialPageRoute(builder: (context) => Write(defaultValue:award[index].todo, index : index)));
+                  // setState(() {
+                  //   award.insert(index, Todos(idx: award[index].idx, todo: result, isSuccess: 1, createAt: award[index].createAt));
+                  //   award.removeAt(index);
+                  // });
+                  setState(() {
+                    award[index].todo = result;
+                  });
 
                   Navigator.of(context).pop(); //창 닫기
+
+                  final response = await Dio().put(
+                      'https://api2.metabx.io/api/examples/${award[index].idx}', data: {"todo" : result});
+                  awardRender();
+
+
+                  // final result = await Navigator.push(context,
+                  //     MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.award[index])));
+                  //
+                  //  _todoProvider.updateAward(index, result);
+                  //
+                  // Navigator.of(context).pop(); //창 닫기
 
                 },
                 child: Text('수정',style: TextStyle(color: Colors.black),),
@@ -222,8 +427,15 @@ class _FirstState extends State<First> {
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () {
-                 _todoProvider.deleteAward(index);
+                  final response = Dio().delete(
+                      'https://api2.metabx.io/api/examples/${award[index].idx}');
+
+                  setState(() {
+                    award.removeAt(index);
+                  });
                   Navigator.of(context).pop(); //창 닫기
+                 // _todoProvider.deleteAward(index);
+                 //  Navigator.of(context).pop(); //창 닫기
                 },
                 child: Text('삭제', style: TextStyle(color: Colors.black),),
               ),

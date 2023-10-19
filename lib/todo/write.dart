@@ -5,15 +5,20 @@
 import 'package:contact/provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
+import '../main.dart';
+
+late TodoProvider _todoProvider;
 class Todo {
-  final String description;//할 일 내용
-  Todo({required this.description});//생성자
+  final String todo;//할 일 내용
+  Todo({required this.todo});//생성자
 }
 
 class Write extends StatefulWidget {
   final String? defaultValue;
-  const Write({this.defaultValue});
+  final int? index;
+  const Write({this.defaultValue, this.index});
   @override
   _SecondState createState() => _SecondState();
 }
@@ -27,16 +32,20 @@ class _SecondState extends State<Write> {
       myController.text = widget.defaultValue!; // 컨트롤러에 기본값 할당
     }
   }
+
   @override
   void dispose() {
     myController.dispose();
     super.dispose();
   }
 
+
   List<Todo> todos = [];//할 일 목록
+  List<Todo> award = [];
 
   @override
   Widget build(BuildContext context) {
+    _todoProvider = Provider.of<TodoProvider>(context);
     return Scaffold(
       body: Container(
 
@@ -45,8 +54,9 @@ class _SecondState extends State<Write> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
+              onTap: () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
+                setState(() {});
               },
               child: SizedBox(
                   // width: double.infinity,
@@ -81,16 +91,30 @@ class _SecondState extends State<Write> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => MyApp()));
               },
               child: Container(
                 width: double.infinity,
                 child: TextButton(child: Text("작성 완료!",style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.w400),textAlign: TextAlign.center),
                   onPressed: () {
-                    String description = myController.text;
-                    // _todoProvider.addTodo(description);
-                    // todos.add(Todo(description: description));
-                    Navigator.pop(context,description);
+                    String todo = myController.text;
+                    var response;
+                    if(widget.defaultValue == null) {
+                      response = Dio().post('https://api2.metabx.io/api/examples', data:{'todo': todo});
+
+                      setState(() {
+                        Navigator.pop(context, response);
+                      });
+                      // _todoProvider.addTodo(description);
+                      // todos.add(Todo(todo: todo));
+                    }else {
+                      setState(() {
+                        Navigator.pop(context, todo);
+                      });
+                    }
+
+
 
                   },),
 
