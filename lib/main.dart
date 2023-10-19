@@ -14,8 +14,8 @@ import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
   late TodoProvider _todoProvider;
-  List<Todos> todos = [];
-  List<Todos> award = [];
+  // List<Todos> todos = [];
+  // List<Todos> award = [];
 
 // todoProvider.addTodo(Todo(idx: todoIndex, todo: "New Todo"));
 
@@ -120,7 +120,7 @@ class _TodosWidgetState extends State<TodosWidget> {
           // _todoProvider.data.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
           // print(_todoProvider.data[idx]);
         }
-        return todos;
+        return _todoProvider.todos;
       } else {
         throw Exception('Failed to load album');
       }
@@ -148,13 +148,13 @@ class _TodosWidgetState extends State<TodosWidget> {
 
           if(isSuccess == 1) {
             // award.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
-            _todoProvider.award.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+            _todoProvider.awards.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
           }
 
           // _todoProvider.data.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
           // print(_todoProvider.data[idx]);
         }
-        return award;
+        return _todoProvider.awards;
       } else {
         throw Exception('Failed to load album');
       }
@@ -287,14 +287,14 @@ class _TodosWidgetState extends State<TodosWidget> {
                       return Center(child:
                       Text('${snapshot.error}'));
                     } else if(snapshot.hasData){
-                      List<Todos> awards = _todoProvider.award;
+                      List<Todos> awards = _todoProvider.awards;
                       // print(snapshot.data?[2].isSuccess);
                       return SizedBox(
                         height: 250,
                         child: ListView.builder(
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
-                            itemCount: _todoProvider.award.length,
+                            itemCount: _todoProvider.awards.length,
                             itemBuilder: (BuildContext content, int index) {
                               // int isSuccess = todos[index].isSuccess!;
                                 Todos award = awards[index];
@@ -351,14 +351,16 @@ class _TodosWidgetState extends State<TodosWidget> {
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff),minimumSize: Size(150, 50), ),
                 onPressed: () {
-                  // _todoProvider.doneTodo(index, _todoProvider.todos[index]);
                   final response = Dio().put(
-                      'https://api2.metabx.io/api/examples/${todos[index].idx}/status');
+                      'https://api2.metabx.io/api/examples/${_todoProvider.todos[index].idx}/status');
+                  // _todoProvider.completeTask(index);
+                  print(_todoProvider.todos[index].idx);
+                  // awardRender();
 
-                  setState(() {
-                    award.add(Todos(idx: todos[index].idx, todo: todos[index].todo, isSuccess: 1, createAt: todos[index].createAt));
-                    todos.removeAt(index);
-                  });
+                   setState(() {
+                     _todoProvider.awards.add(Todos(idx: _todoProvider.todos[index].idx, todo: _todoProvider.todos[index].todo, isSuccess: _todoProvider.todos[index].isSuccess, createAt: _todoProvider.todos[index].createAt));
+                     _todoProvider.todos.removeAt(index);
+                   });
                       Navigator.of(context).pop(); //창 닫기
                 },
                 child: Text('확인',style: TextStyle(color: Colors.red),),
@@ -396,29 +398,13 @@ class _TodosWidgetState extends State<TodosWidget> {
                 style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () async {
                   final result = await Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Write(defaultValue:award[index].todo, index : index)));
-                  // setState(() {
-                  //   award.insert(index, Todos(idx: award[index].idx, todo: result, isSuccess: 1, createAt: award[index].createAt));
-                  //   award.removeAt(index);
-                  // });
-                  setState(() {
-                    award[index].todo = result;
-                  });
+                      MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.awards[index].todo, index : index)));
 
                   Navigator.of(context).pop(); //창 닫기
 
+                  _todoProvider.updateAward(index, result);
                   final response = await Dio().put(
-                      'https://api2.metabx.io/api/examples/${award[index].idx}', data: {"todo" : result});
-                  awardRender();
-
-
-                  // final result = await Navigator.push(context,
-                  //     MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.award[index])));
-                  //
-                  //  _todoProvider.updateAward(index, result);
-                  //
-                  // Navigator.of(context).pop(); //창 닫기
-
+                      'https://api2.metabx.io/api/examples/${_todoProvider.awards[index].idx}', data: {"todo" : result});
                 },
                 child: Text('수정',style: TextStyle(color: Colors.black),),
               ),
@@ -428,14 +414,11 @@ class _TodosWidgetState extends State<TodosWidget> {
                 style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
                 onPressed: () {
                   final response = Dio().delete(
-                      'https://api2.metabx.io/api/examples/${award[index].idx}');
+                      'https://api2.metabx.io/api/examples/${_todoProvider.awards[index].idx}');
 
-                  setState(() {
-                    award.removeAt(index);
-                  });
                   Navigator.of(context).pop(); //창 닫기
-                 // _todoProvider.deleteAward(index);
-                 //  Navigator.of(context).pop(); //창 닫기
+                  _todoProvider.deleteAward(index);
+                  // awardRender();
                 },
                 child: Text('삭제', style: TextStyle(color: Colors.black),),
               ),
