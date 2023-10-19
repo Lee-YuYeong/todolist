@@ -19,12 +19,14 @@ class Write extends StatefulWidget {
   final String? defaultValue;
   final int? index;
   const Write({this.defaultValue, this.index});
+
   @override
   _SecondState createState() => _SecondState();
 }
 
 class _SecondState extends State<Write> {
   final myController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -38,10 +40,6 @@ class _SecondState extends State<Write> {
     myController.dispose();
     super.dispose();
   }
-
-
-  List<Todo> todos = [];//할 일 목록
-  List<Todo> award = [];
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +84,6 @@ class _SecondState extends State<Write> {
                     ),
                   ),
                 ),
-
               ),
             ),
             GestureDetector(
@@ -106,18 +103,13 @@ class _SecondState extends State<Write> {
                       setState(() {
                         Navigator.pop(context, response);
                       });
-                      // _todoProvider.addTodo(description);
-                      // todos.add(Todo(todo: todo));
+
                     }else {
                       setState(() {
                         Navigator.pop(context, todo);
                       });
                     }
-
-
-
                   },),
-
               ),
             )
           ],
