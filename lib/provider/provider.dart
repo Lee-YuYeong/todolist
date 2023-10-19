@@ -1,8 +1,5 @@
 // todo_provider.dart
 import 'package:flutter/foundation.dart';
-import 'package:dio/dio.dart';
-
-import '../main.dart';
 import '../model/todosVO.dart';
 
 

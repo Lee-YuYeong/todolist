@@ -2,14 +2,11 @@
 // ! : null이 절대 아님을 단언
 // ? : null일 수도 있음
 
-import 'package:contact/provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
-
 import '../main.dart';
 
-late TodoProvider _todoProvider;
+
 class Todo {
   final String todo;//할 일 내용
   Todo({required this.todo});//생성자
@@ -43,10 +40,9 @@ class _SecondState extends State<Write> {
 
   @override
   Widget build(BuildContext context) {
-    _todoProvider = Provider.of<TodoProvider>(context);
+
     return Scaffold(
       body: Container(
-
         margin: EdgeInsets.fromLTRB(0, 60, 10, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,

@@ -5,7 +5,6 @@
 // didChangeDependencied() : 의존성 변경시 호출
 // didUpdateWidget() : 위젯 갱신 시
 // setState() : 상태 변경 시
-import 'dart:convert';
 
 import 'package:contact/provider/provider.dart';
 import 'package:contact/todo/write.dart';
@@ -185,13 +184,13 @@ class _TodosWidgetState extends State<TodosWidget> {
                       height: 250,
                       child: ListView.builder(
                           scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
+                          shrinkWrap: true,//child 크기만큼 할당
                           itemCount: _todoProvider.todos.length,
                           itemBuilder: (BuildContext content, int index) {
                             Todos todo = todos[index];
 
                             return Card(
-                              elevation: 3,
+                              elevation: 3,//음영 지정
                               margin: EdgeInsets.all(8),
                               color: Color(0xfff3eae0),
                               shape: RoundedRectangleBorder(
