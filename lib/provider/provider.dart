@@ -6,13 +6,22 @@ import '../model/todosVO.dart';
 
 class TodoProvider with ChangeNotifier {
 
-  final List<Todos> _todos = []; //진행 목록
-  final List<Todos> _awards = []; // 명예의 전당
+   List<Todos> _todos = []; //진행 목록
+   List<Todos> _awards = []; // 명예의 전당
 
   //getter
   List<Todos> get todos => _todos;
   List<Todos> get awards => _awards;
 
+  void setTodos(List<Todos> newTodos) {
+    _todos = newTodos;
+    notifyListeners();
+  }
+
+  void setAwards(List<Todos> newTodos) {
+    _awards = newTodos;
+    notifyListeners();
+  }
   //할 일 추가
   void addTodo(Todos todo) {
     _todos.add(todo);

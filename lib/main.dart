@@ -58,32 +58,40 @@ class _TodosWidgetState extends State<TodosWidget> {
   @override
   void initState() {
     super.initState();
-    futureTodos = fetchTodos();
-    futureAward = fetchAward();
+    futureTodos = fetchData(isSuccess : 0);
+    futureAward = fetchData(isSuccess : 1);
   }
 
 //Future : 지금은 없지만 미래에 요청한 데이터 혹은 에러가 담길 그릇 - isSuccess == 0
-  Future<List<Todos>> fetchTodos() async {
+  Future<List<Todos>> fetchData({required int isSuccess}) async {
     try {
       final response = await Dio().get(
-        "https://api2.metabx.io/api/examples"
+        "https://api2.metabx.io/api/examples",
       );
 
       if (response.statusCode == 200) {
         var data = response.data;
 
+        List<Todos> items = [];
+
         for (var item in data['data']) {
           int idx = item['idx'];
           String todo = item['todo'];
-          int isSuccess = item['isSuccess'];
+          int success = item['isSuccess'];
           String createdAt = item['createdAt'];
 
-          if(isSuccess == 0) {
-            _todoProvider.addTodo(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
+          if (success == isSuccess) {
+            items.add(Todos(idx: idx, todo: todo, isSuccess: success, createAt: createdAt));
           }
-
         }
-        return _todoProvider.todos;
+
+        if (isSuccess == 0) {
+          _todoProvider.setTodos(items);
+        } else if (isSuccess == 1) {
+          _todoProvider.setAwards(items);
+        }
+
+        return items;
       } else {
         throw Exception('Failed to load album');
       }
@@ -92,38 +100,11 @@ class _TodosWidgetState extends State<TodosWidget> {
     }
   }
 
-  Future<List<Todos>> fetchAward() async {
-    try {
-      final response = await Dio().get(
-        "https://api2.metabx.io/api/examples"
-      );
-
-      if (response.statusCode == 200) {
-        var data = response.data;
-
-        for (var item in data['data']) {
-          int idx = item['idx'];
-          String todo = item['todo'];
-          int isSuccess = item['isSuccess'];
-          String createdAt = item['createdAt'];
-
-          if(isSuccess == 1) {
-            _todoProvider.awards.add(Todos(idx: idx, todo: todo, isSuccess: isSuccess, createAt: createdAt));
-          }
-
-        }
-        return _todoProvider.awards;
-      } else {
-        throw Exception('Failed to load album');
-      }
-    } catch (e) {
-      throw Exception('Error occurred while fetching data');
-    }
-  }
+  
 
   void todoRender() {
     setState(() {
-      futureTodos = fetchTodos();
+      futureTodos = fetchData(isSuccess: 0);
     });
   }
 
