@@ -42,30 +42,29 @@ class _SecondState extends State<Write> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      body: Container(
-        margin: EdgeInsets.fromLTRB(0, 60, 10, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+      body: Column(
+          // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             GestureDetector(
               onTap: () async {
                 await Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
                 setState(() {});
               },
-              child: SizedBox(
-                // width: double.infinity,
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 60, 10, 10),
+                alignment: Alignment.centerRight,
                   child: Text("취소", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w200))
               ),
             ),
             Container(
-                width: double.infinity,
+                alignment: Alignment.centerLeft,
                 margin: EdgeInsets.fromLTRB(10, 50, 0, 20),
                 child: Text("오늘 내 할 일은?", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 30), textAlign: TextAlign.start,)
             ),
             Flexible(
               fit: FlexFit.loose, //화면 크기를 넘어갈 경우
               child: Container(
-                width: double.infinity,
+                width: 800,
                 height: 800,
                 child: TextField(
                   controller: myController,
@@ -88,7 +87,7 @@ class _SecondState extends State<Write> {
                     MaterialPageRoute(builder: (context) => MyApp()));
               },
               child: Container(
-                width: double.infinity,
+                alignment: Alignment.center,
                 child: TextButton(child: Text("작성 완료!",style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.w400),textAlign: TextAlign.center),
                   onPressed: () {
                     String todo = myController.text;
@@ -111,7 +110,6 @@ class _SecondState extends State<Write> {
               ),
             )
           ],
-        ),
       ),
 
     );
