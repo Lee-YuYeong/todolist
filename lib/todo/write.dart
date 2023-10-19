@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../main.dart';
 
-
+var dio = Dio();
 class Todo {
   final String todo;//할 일 내용
   Todo({required this.todo});//생성자
@@ -53,7 +53,7 @@ class _SecondState extends State<Write> {
                 setState(() {});
               },
               child: SizedBox(
-                  // width: double.infinity,
+                // width: double.infinity,
                   child: Text("취소", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w200))
               ),
             ),
@@ -92,18 +92,20 @@ class _SecondState extends State<Write> {
                 child: TextButton(child: Text("작성 완료!",style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.w400),textAlign: TextAlign.center),
                   onPressed: () {
                     String todo = myController.text;
-                    var response;
-                    if(widget.defaultValue == null) {
-                      response = Dio().post('https://api2.metabx.io/api/examples', data:{'todo': todo});
+                   if(todo != ""){
+                      if(widget.defaultValue == null) {
+                        var response = dio.post('https://api2.metabx.io/api/examples', data:{'todo': todo});
 
-                      setState(() {
-                        Navigator.pop(context, response);
-                      });
+                        setState(() {
+                          Navigator.pop(context, response);
+                        });
 
-                    }else {
-                      setState(() {
-                        Navigator.pop(context, todo);
-                      });
+                      }else {
+                        setState(() {
+                          Navigator.pop(context, todo);
+                        });
+                    }
+
                     }
                   },),
               ),

@@ -2,8 +2,6 @@
 import 'package:flutter/foundation.dart';
 import '../model/todosVO.dart';
 
-
-
 class TodoProvider with ChangeNotifier {
 
    List<Todos> _todos = []; //진행 목록
@@ -13,15 +11,18 @@ class TodoProvider with ChangeNotifier {
   List<Todos> get todos => _todos;
   List<Todos> get awards => _awards;
 
+  //처음 진행 목록 세팅
   void setTodos(List<Todos> newTodos) {
     _todos = newTodos;
     notifyListeners();
   }
 
+  //처음 명예의 전당 세팅
   void setAwards(List<Todos> newTodos) {
     _awards = newTodos;
     notifyListeners();
   }
+
   //할 일 추가
   void addTodo(Todos todo) {
     _todos.add(todo);
