@@ -23,6 +23,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => TodoProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'Jua-Regular'),
         home: TodosWidget(),
       )
@@ -44,8 +45,6 @@ class _TodosWidgetState extends State<TodosWidget> {
   late Future<List<Todos>> futureTodos;
   late Future<List<Todos>> futureAward;
 
-  late TodoProvider _todoProvider;
-
 
   @override
   void didChangeDependencies() {
@@ -54,12 +53,6 @@ class _TodosWidgetState extends State<TodosWidget> {
     futureTodos = fetchData(isSuccess : 0, todoProvider: _todoProvider);
     futureAward = fetchData(isSuccess : 1, todoProvider: _todoProvider);
   }
-
-  // void todoRender() {
-  //   setState(() {
-  //     futureTodos = fetchData(isSuccess: 0, todoProvider: _todoProvider);
-  //   });
-  // }
 
   void dispose() {
     super.dispose();
@@ -78,13 +71,8 @@ class _TodosWidgetState extends State<TodosWidget> {
                   Text("7월 17일",style: TextStyle(fontWeight: FontWeight.w500, fontSize: 50, ), ),
                   GestureDetector(
                       onTap: () async {
-                        var result = await Navigator.push(context,
+                        await Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Write()));
-
-                        if(result != null) {
-                          // _todoProvider.todos.clear();
-                          // todoRender();
-                        }
                       },
                       child : Icon(Icons.add, size: 50,)
                   ),
@@ -102,29 +90,36 @@ class _TodosWidgetState extends State<TodosWidget> {
           ),
 
           Expanded(
-            child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,//child 크기만큼 할당
-                itemCount: _todoProvider.todos.length,
-                itemBuilder: (BuildContext content, int index) {
-                  List<Todos> todos = _todoProvider.todos;
-                  Todos todo = todos[index];
-
-                  return Card(
-                    elevation: 3,//음영 지정
-                    margin: EdgeInsets.all(8),
-                    color: Color(0xfff3eae0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                          Radius.elliptical(10, 10)),
-                    ),
-                    child :
-                    ListTile(title :
-                    Text(todo.todo!, textAlign: TextAlign.center,),
-                      onTap: () =>_showDialog(content,index),
-                    ),
-                  );
-                }),
+            child: Consumer<TodoProvider>(
+              builder:(BuildContext context,TodoProvider todoProvider,_) {
+                final todos = todoProvider.todos;
+                if (todos.isEmpty) {
+                  return Text("provider null!!");
+                }else{
+                  return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true, //child 크기만큼 할당
+                      itemCount: todos.length,
+                      itemBuilder: (BuildContext content, int index) {
+                        final item = todos[index];
+                        return Card(
+                          elevation: 3, //음영 지정
+                          margin: EdgeInsets.all(8),
+                          color: Color(0xfff3eae0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                                Radius.elliptical(10, 10)),
+                          ),
+                          child:
+                          ListTile(title:
+                          Text(item.todo!, textAlign: TextAlign.center,),
+                            onTap: () => _showDialog(content, index),
+                          ),
+                        );
+                      });
+                    }
+                 }
+              ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(10, 10, 30, 0),
@@ -141,29 +136,36 @@ class _TodosWidgetState extends State<TodosWidget> {
           ),
 
           Expanded(
-            child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,//child 크기만큼 할당
-                itemCount: _todoProvider.awards.length,
-                itemBuilder: (BuildContext content, int index) {
-                  List<Todos> awards = _todoProvider.awards;
-                  Todos award = awards[index];
-
-                  return Card(
-                    elevation: 3,//음영 지정
-                    margin: EdgeInsets.all(8),
-                    color: Color(0xfff3eae0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                          Radius.elliptical(10, 10)),
-                    ),
-                    child :
-                    ListTile(title :
-                    Text(award.todo!, textAlign: TextAlign.center,),
-                      onTap: () =>_showDialog(content,index),
-                    ),
-                  );
-                }),
+            child: Consumer<TodoProvider>(
+                builder:(BuildContext context,TodoProvider todoProvider,_) {
+                  final awards = todoProvider.awards;
+                  if (awards.isEmpty) {
+                    return Text("provider null!!");
+                  }else{
+                    return ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true, //child 크기만큼 할당
+                        itemCount: awards.length,
+                        itemBuilder: (BuildContext content, int index) {
+                          final item = awards[index];
+                          return Card(
+                            elevation: 3, //음영 지정
+                            margin: EdgeInsets.all(8),
+                            color: Color(0xfff3eae0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                  Radius.elliptical(10, 10)),
+                            ),
+                            child:
+                            ListTile(title:
+                            Text(item.todo!, textAlign: TextAlign.center,),
+                              onTap: () => _awardshowDialog(content, index),
+                            ),
+                          );
+                        });
+                  }
+                }
+            ),
           ),
         ],
       ),
@@ -177,10 +179,8 @@ void _showDialog(context, int index) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: new Text("목표를 완료 하셨습니까?", textAlign: TextAlign.center,),
-        content:
-        SingleChildScrollView(
-            child:new Text("완료된 항목은 하단 명예의 전당에 표시 됩니다.",textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200),)
-        ),
+        content:new Text("완료된 항목은 하단 명예의 전당에 표시 됩니다.",textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200),),
+
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10)
         ),
@@ -191,7 +191,7 @@ void _showDialog(context, int index) {
               onPressed: () {
                 final response = dio.put(
                     'https://api2.metabx.io/api/examples/${_todoProvider.todos[index].idx}/status')
-                    .then((value) => Dio().get(
+                    .then((value) => dio.get(
                     "https://api2.metabx.io/api/examples"));
 
                   _todoProvider.completeTask(index);
@@ -223,10 +223,7 @@ void _awardshowDialog(context, int index) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: new Text("수정 또는 삭제", textAlign: TextAlign.center,),
-        content:
-        SingleChildScrollView(
-            child:new Text("항목을 수정하거나 삭제할 수 있습니다.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200))
-        ),
+        content: new Text("항목을 수정하거나 삭제할 수 있습니다.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200)),
         actions: <Widget>[
           Container(
             child: OutlinedButton(
@@ -237,14 +234,12 @@ void _awardshowDialog(context, int index) {
 
                 Navigator.of(context).pop(); //창 닫기
 
-
-                    _todoProvider.updateAward(index, result);
+                _todoProvider.updateAward(index, result);
 
                 final response = await dio.put(
                     'https://api2.metabx.io/api/examples/${_todoProvider.awards[index].idx}', data: {"todo" : result})
                     .then((value) => Dio().get(
                     "https://api2.metabx.io/api/examples"));
-
               },
               child: Text('수정',style: TextStyle(color: Colors.black),),
             ),
@@ -268,10 +263,4 @@ void _awardshowDialog(context, int index) {
     },
   );
 }
-
-
-
-
 }
-
-// }

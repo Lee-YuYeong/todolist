@@ -2,10 +2,12 @@
 // ! : null이 절대 아님을 단언
 // ? : null일 수도 있음
 
+import 'package:contact/model/todosVO.dart';
 import 'package:contact/provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
+import '../api_client/fetchdata.dart';
 import '../main.dart';
 
 var dio = Dio();
@@ -34,6 +36,12 @@ class _SecondState extends State<Write> {
     if (widget.defaultValue != null) {
       myController.text = widget.defaultValue!; // 컨트롤러에 기본값 할당
     }
+  }
+
+  void todoRender() {
+    setState(() {
+      fetchData(isSuccess: 0, todoProvider: _todoProvider);
+    });
   }
 
   @override
@@ -85,30 +93,46 @@ class _SecondState extends State<Write> {
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => TodosWidget()));
-              },
-              child: Container(
+             Container(
                 alignment: Alignment.center,
                 child: TextButton(child: Text("작성 완료!",style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.w400),textAlign: TextAlign.center),
-                  onPressed: () {
+                  onPressed: () async {
                     String todo = myController.text;
-                   if(todo != ""){
+                    if(todo != ""){ //글 작성 했을 경우
                       if(widget.defaultValue == null) {
-                        var response = dio.post('https://api2.metabx.io/api/examples', data:{'todo': todo});
-                        Navigator.pop(context, response);
-                      }else {
-                          Navigator.pop(context, todo);
+                       await dio.post('https://api2.metabx.io/api/examples', data:{'todo': todo});
+                       fetchData(isSuccess : 0, todoProvider: _todoProvider);
+                      }
+                      Navigator.pop(context, todo);
+                    }else {
+                      print("write null");//글 작성 안 했을 경우
+                      writeDialog();
                     }
-                   }
                   },
                 ),
               ),
-            )
           ],
         ),
+    );
+  }
+
+  //글을 작성 안 했을 경우
+  void writeDialog () {
+    showDialog(
+        context: context,
+        builder:(BuildContext context) {
+          return AlertDialog(
+            title: new Text("글 작성 글 작성 ~~"),
+            actions: <Widget>[
+              OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("확인")
+              )
+            ],
+          );
+        }
     );
   }
 }
