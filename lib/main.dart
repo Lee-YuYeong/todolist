@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
+import 'api_client/fetchdata.dart';
 import 'model/todosVO.dart';
 
 
@@ -25,7 +26,6 @@ void main() {
     ),
   );
 }
-
 
 var dio = Dio();
 
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
+late TodoProvider _todoProvider;
 class TodosWidget extends StatefulWidget {
   const TodosWidget({Key? key}) : super(key: key);
 
@@ -58,54 +58,20 @@ class _TodosWidgetState extends State<TodosWidget> {
 
   late TodoProvider _todoProvider;
 
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _todoProvider = Provider.of<TodoProvider>(context, listen:false);
-    futureTodos = fetchData(isSuccess : 0);
-    futureAward = fetchData(isSuccess : 1);
+    futureTodos = fetchData(isSuccess : 0, todoProvider: _todoProvider);
+    futureAward = fetchData(isSuccess : 1, todoProvider: _todoProvider);
   }
 
-//Future : 지금은 없지만 미래에 요청한 데이터 혹은 에러가 담길 그릇 - isSuccess == 0
-  Future<List<Todos>> fetchData({required int isSuccess}) async {
-    try {
-      final response = await dio.get(
-        "https://api2.metabx.io/api/examples",
-      );
-
-      if (response.statusCode == 200) {
-        var data = response.data;
-
-        List<Todos> items = [];
-
-        for (var item in data['data']) {
-          if (item['isSuccess'] == isSuccess) {
-            items.add(Todos(
-                idx: item['idx'], todo: item['todo'], isSuccess: item['isSuccess'], createAt: item['createdAt'])
-            );
-          }
-        }
-
-        if (isSuccess == 0) {
-          _todoProvider.setTodos(items);
-        } else if (isSuccess == 1) {
-          _todoProvider.setAwards(items);
-        }
-
-        return items;
-      } else {
-        throw Exception('통신 에러');
-      }
-    } catch (e) {
-      throw Exception('fetch data 에러 발생');
-    }
-  }
-
-  void todoRender() {
-    setState(() {
-      futureTodos = fetchData(isSuccess: 0);
-    });
-  }
+  // void todoRender() {
+  //   setState(() {
+  //     futureTodos = fetchData(isSuccess: 0, todoProvider: _todoProvider);
+  //   });
+  // }
 
   void dispose() {
     super.dispose();
@@ -127,11 +93,11 @@ class _TodosWidgetState extends State<TodosWidget> {
                         var result = await Navigator.push(context,
                             MaterialPageRoute(builder: (context) => Write()));
 
-                          _todoProvider.todos.clear();
-                          todoRender();
-
+                        if(result != null) {
+                          // _todoProvider.todos.clear();
+                          // todoRender();
+                        }
                       },
-
                       child : Icon(Icons.add, size: 50,)
                   ),
                 ],
@@ -146,50 +112,31 @@ class _TodosWidgetState extends State<TodosWidget> {
               ],
             ),
           ),
-          Column(
-            children: [
-              FutureBuilder<List<Todos>>(
-                  future: futureTodos,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child:CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child:
-                      Text('${snapshot.error}'));
-                    } else if(snapshot.hasData){
-                      List<Todos> todos = _todoProvider.todos;
-                      return SizedBox(
-                        height: 250,
-                        child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,//child 크기만큼 할당
-                            itemCount: _todoProvider.todos.length,
-                            itemBuilder: (BuildContext content, int index) {
-                              Todos todo = todos[index];
 
-                              return Card(
-                                elevation: 3,//음영 지정
-                                margin: EdgeInsets.all(8),
-                                color: Color(0xfff3eae0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(
-                                      Radius.elliptical(10, 10)),
-                                ),
-                                child :
-                                ListTile(title :
-                                Text(todo.todo!, textAlign: TextAlign.center,),
-                                  onTap:
-                                      () =>_showDialog(content,index),
-                                ),
-                              );
-                            }),
-                      );
-                    }else{
-                      return Center(child: Text('데이터 없음'));
-                    }
-                  }
-              ),
-            ],
+          Expanded(
+            child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,//child 크기만큼 할당
+                itemCount: _todoProvider.todos.length,
+                itemBuilder: (BuildContext content, int index) {
+                  List<Todos> todos = _todoProvider.todos;
+                  Todos todo = todos[index];
+
+                  return Card(
+                    elevation: 3,//음영 지정
+                    margin: EdgeInsets.all(8),
+                    color: Color(0xfff3eae0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                          Radius.elliptical(10, 10)),
+                    ),
+                    child :
+                    ListTile(title :
+                    Text(todo.todo!, textAlign: TextAlign.center,),
+                      onTap: () =>_showDialog(content,index),
+                    ),
+                  );
+                }),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(10, 10, 30, 0),
@@ -205,163 +152,138 @@ class _TodosWidgetState extends State<TodosWidget> {
             ),
           ),
 
-          Column(
-            children: [
-              FutureBuilder<List<Todos>>(
-                  future: futureAward,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child:CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child:
-                      Text('${snapshot.error}'));
-                    } else if(snapshot.hasData){
-                      List<Todos> awards = _todoProvider.awards;
-                      return SizedBox(
-                        height: 250,
-                        child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemCount: _todoProvider.awards.length,
-                            itemBuilder: (BuildContext content, int index) {
-                              Todos award = awards[index];
-                              return Card(
-                                elevation: 3,
-                                margin: EdgeInsets.all(8),
-                                color: Color(0xfff3eae0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(
-                                      Radius.elliptical(10, 10)),
-                                ),
-                                child:
-                                ListTile(title:
-                                Text(
-                                  award.todo!, textAlign: TextAlign.center,),
-                                  onTap:
-                                      () => _awardshowDialog(content, index),
-                                ),
-                              );
+          Expanded(
+            child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,//child 크기만큼 할당
+                itemCount: _todoProvider.awards.length,
+                itemBuilder: (BuildContext content, int index) {
+                  List<Todos> awards = _todoProvider.awards;
+                  Todos award = awards[index];
 
-                            }),
-                      );
-                    }else{
-                      return Center(child: Text('데이터 없음'));
-                    }
-                  }
-              ),
-            ],
+                  return Card(
+                    elevation: 3,//음영 지정
+                    margin: EdgeInsets.all(8),
+                    color: Color(0xfff3eae0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                          Radius.elliptical(10, 10)),
+                    ),
+                    child :
+                    ListTile(title :
+                    Text(award.todo!, textAlign: TextAlign.center,),
+                      onTap: () =>_showDialog(content,index),
+                    ),
+                  );
+                }),
           ),
-
-
         ],
       ),
     );
   }
 
-  //할 일 목록 다이어로그
-  void _showDialog(context, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: new Text("목표를 완료 하셨습니까?", textAlign: TextAlign.center,),
-          content:
-          SingleChildScrollView(
-              child:new Text("완료된 항목은 하단 명예의 전당에 표시 됩니다.",textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200),)
-          ),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)
-          ),
-          actions: <Widget>[
-            Container(
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff),minimumSize: Size(150, 50), ),
-                onPressed: () {
-                  final response = dio.put(
-                      'https://api2.metabx.io/api/examples/${_todoProvider.todos[index].idx}/status')
-                      .then((value) => Dio().get(
-                      "https://api2.metabx.io/api/examples"));
+//할 일 목록 다이어로그
+void _showDialog(context, int index) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: new Text("목표를 완료 하셨습니까?", textAlign: TextAlign.center,),
+        content:
+        SingleChildScrollView(
+            child:new Text("완료된 항목은 하단 명예의 전당에 표시 됩니다.",textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200),)
+        ),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10)
+        ),
+        actions: <Widget>[
+          Container(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff),minimumSize: Size(150, 50), ),
+              onPressed: () {
+                final response = dio.put(
+                    'https://api2.metabx.io/api/examples/${_todoProvider.todos[index].idx}/status')
+                    .then((value) => Dio().get(
+                    "https://api2.metabx.io/api/examples"));
 
+                  _todoProvider.completeTask(index);
 
-                    _todoProvider.completeTask(index);
-
-
-                  Navigator.of(context).pop(); //창 닫기
-                },
-                child: Text('확인',style: TextStyle(color: Colors.red),),
-              ),
+                Navigator.of(context).pop(); //창 닫기
+              },
+              child: Text('확인',style: TextStyle(color: Colors.red),),
             ),
-            Container(
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
-                onPressed: () {
-
-                  Navigator.of(context).pop(); //창 닫기
-
-                },
-                child: Text('취소', style: TextStyle(color: Colors.black),),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  //명예의 전당 다이어로그
-  void _awardshowDialog(context, int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: new Text("수정 또는 삭제", textAlign: TextAlign.center,),
-          content:
-          SingleChildScrollView(
-              child:new Text("항목을 수정하거나 삭제할 수 있습니다.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200))
           ),
-          actions: <Widget>[
-            Container(
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
-                onPressed: () async {
-                  final result = await Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.awards[index].todo, index : index)));
+          Container(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
+              onPressed: () {
+                Navigator.of(context).pop(); //창 닫기
+              },
+              child: Text('취소', style: TextStyle(color: Colors.black),),
+            ),
+          )
+        ],
+      );
+    },
+  );
+}
 
-                  Navigator.of(context).pop(); //창 닫기
+//명예의 전당 다이어로그
+void _awardshowDialog(context, int index) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: new Text("수정 또는 삭제", textAlign: TextAlign.center,),
+        content:
+        SingleChildScrollView(
+            child:new Text("항목을 수정하거나 삭제할 수 있습니다.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w200))
+        ),
+        actions: <Widget>[
+          Container(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
+              onPressed: () async {
+                final result = await Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Write(defaultValue:_todoProvider.awards[index].todo, index : index)));
+
+                Navigator.of(context).pop(); //창 닫기
 
 
                     _todoProvider.updateAward(index, result);
 
+                final response = await dio.put(
+                    'https://api2.metabx.io/api/examples/${_todoProvider.awards[index].idx}', data: {"todo" : result})
+                    .then((value) => Dio().get(
+                    "https://api2.metabx.io/api/examples"));
 
-                  final response = await dio.put(
-                      'https://api2.metabx.io/api/examples/${_todoProvider.awards[index].idx}', data: {"todo" : result})
-                      .then((value) => Dio().get(
-                      "https://api2.metabx.io/api/examples"));
-
-                },
-                child: Text('수정',style: TextStyle(color: Colors.black),),
-              ),
+              },
+              child: Text('수정',style: TextStyle(color: Colors.black),),
             ),
-            Container(
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
-                onPressed: () async {
-                  Navigator.of(context).pop(); //창 닫기
-                  final response = await dio.delete(
-                      'https://api2.metabx.io/api/examples/${_todoProvider.awards[index].idx}');
-                  print("1111111111");
+          ),
+          Container(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(foregroundColor: Color(0xffffffff), minimumSize: Size(150, 50)),
+              onPressed: () async {
+                Navigator.of(context).pop(); //창 닫기
+                final response = await dio.delete(
+                    'https://api2.metabx.io/api/examples/${_todoProvider.awards[index].idx}');
 
-                    _todoProvider.deleteAward(index);
+                  _todoProvider.deleteAward(index);
 
-                },
-                child: Text('삭제', style: TextStyle(color: Colors.black),),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
+              },
+              child: Text('삭제', style: TextStyle(color: Colors.black),),
+            ),
+          )
+        ],
+      );
+    },
+  );
+}
+
+
 
 
 }
+
+// }

@@ -2,8 +2,10 @@
 // ! : null이 절대 아님을 단언
 // ? : null일 수도 있음
 
+import 'package:contact/provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
 import '../main.dart';
 
 var dio = Dio();
@@ -23,10 +25,11 @@ class Write extends StatefulWidget {
 
 class _SecondState extends State<Write> {
   final myController = TextEditingController();
-
+  late TodoProvider _todoProvider;
   @override
   void initState() {
     super.initState();
+    _todoProvider = Provider.of<TodoProvider>(context, listen:false);
     if (widget.defaultValue != null) {
       myController.text = widget.defaultValue!; // 컨트롤러에 기본값 할당
     }
@@ -95,17 +98,12 @@ class _SecondState extends State<Write> {
                       if(widget.defaultValue == null) {
                         var response = dio.post('https://api2.metabx.io/api/examples', data:{'todo': todo});
 
-                        setState(() {
-                          Navigator.pop(context, response);
-                        });
+                        Navigator.pop(context, response);
 
                       }else {
-                        setState(() {
                           Navigator.pop(context, todo);
-                        });
                     }
-
-                    }
+                   }
                   },),
               ),
             )
@@ -114,4 +112,6 @@ class _SecondState extends State<Write> {
 
     );
   }
+
+
 }
