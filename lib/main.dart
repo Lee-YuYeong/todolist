@@ -22,27 +22,15 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => TodoProvider()),
       ],
-      child: MyApp(),
+      child: MaterialApp(
+        theme: ThemeData(fontFamily: 'Jua-Regular'),
+        home: TodosWidget(),
+      )
     ),
   );
 }
 
 var dio = Dio();
-
-//stless + Enter > 자동완성
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(fontFamily: 'Jua-Regular'),
-      home: TodosWidget(),
-    );
-  }
-}
 
 late TodoProvider _todoProvider;
 class TodosWidget extends StatefulWidget {

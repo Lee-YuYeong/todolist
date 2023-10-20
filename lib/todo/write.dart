@@ -26,6 +26,7 @@ class Write extends StatefulWidget {
 class _SecondState extends State<Write> {
   final myController = TextEditingController();
   late TodoProvider _todoProvider;
+
   @override
   void initState() {
     super.initState();
@@ -50,7 +51,7 @@ class _SecondState extends State<Write> {
           children: [
             GestureDetector(
               onTap: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => TodosWidget()));
                 setState(() {});
               },
               child: Container(
@@ -87,7 +88,7 @@ class _SecondState extends State<Write> {
             GestureDetector(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MyApp()));
+                    MaterialPageRoute(builder: (context) => TodosWidget()));
               },
               child: Container(
                 alignment: Alignment.center,
@@ -97,21 +98,17 @@ class _SecondState extends State<Write> {
                    if(todo != ""){
                       if(widget.defaultValue == null) {
                         var response = dio.post('https://api2.metabx.io/api/examples', data:{'todo': todo});
-
                         Navigator.pop(context, response);
-
                       }else {
                           Navigator.pop(context, todo);
                     }
                    }
-                  },),
+                  },
+                ),
               ),
             )
           ],
-      ),
-
+        ),
     );
   }
-
-
 }
